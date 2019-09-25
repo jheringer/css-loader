@@ -14,7 +14,7 @@ import {
 } from 'loader-utils';
 
 import schema from './options.json';
-import { importParser, icssParser, urlParser } from './plugins';
+import { importParser, icssParser, urlParser, trimPlugin } from './plugins';
 import {
   normalizeSourceMap,
   getModulesPlugins,
@@ -92,22 +92,30 @@ export default function loader(content, map, meta) {
     );
   }
 
+  plugins.push(trimPlugin());
+
+  const postCssOptions = {
+    from: getRemainingRequest(this)
+      .split('!')
+      .pop(),
+    to: getCurrentRequest(this)
+      .split('!')
+      .pop(),
+    map: options.sourceMap
+      ? {
+          prev: map,
+          inline: false,
+          annotation: false,
+        }
+      : null,
+  };
+
+  if (options.postCssSyntax) {
+    postCssOptions.syntax = options.postCssSyntax;
+  }
+
   postcss(plugins)
-    .process(content, {
-      from: getRemainingRequest(this)
-        .split('!')
-        .pop(),
-      to: getCurrentRequest(this)
-        .split('!')
-        .pop(),
-      map: options.sourceMap
-        ? {
-            prev: map,
-            inline: false,
-            annotation: false,
-          }
-        : null,
-    })
+    .process(content, postCssOptions)
     .then((result) => {
       result
         .warnings()
