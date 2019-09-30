@@ -4,7 +4,6 @@ npm-debug.log*
 .eslintcache
 
 /coverage
-/dist
 /local
 /reports
 /node_modules
@@ -16,4 +15,3 @@ Thumbs.db
 .vscode
 *.sublime-project
 *.sublime-workspace
-package-lock.json
